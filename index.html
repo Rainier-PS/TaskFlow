@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors duration-300">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List App</title>
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%236366f1'/%3E%3Ctext x='50%25' y='58%25' text-anchor='middle' dominant-baseline='middle' font-size='38' fill='white' font-family='Segoe UI Emoji, Apple Color Emoji, Noto Color Emoji, Arial, sans-serif'%3E%F0%9F%93%9D%3C/text%3E%3C/svg%3E">
+
+    <meta name="description" content="A simple, beautiful, and theme-aware To-Do List app. Organize your tasks, filter, sort, and enjoy light/dark mode.">
+    <meta name="keywords" content="to-do, todo, task, list, productivity, dark mode, light mode, JavaScript, Tailwind CSS">
+    <meta name="author" content="Your Name">
+    <meta property="og:title" content="To-Do List App">
+    <meta property="og:description" content="A simple, beautiful, and theme-aware To-Do List app. Organize your tasks, filter, sort, and enjoy light/dark mode.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://em-content.zobj.net/source/microsoft-teams/363/memo_1f4dd.png">
+    <meta property="og:url" content="">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class'
+      }
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-purple-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen flex flex-col items-center justify-center transition-colors duration-300">
+    <div class="w-full max-w-lg p-6 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-xl backdrop-blur-md">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-3xl font-extrabold text-blue-700 dark:text-purple-300 tracking-tight">To-Do List</h1>
+            <button id="dark-toggle" aria-label="Toggle dark mode" class="text-xl p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-200 dark:hover:bg-purple-700 transition-colors">
+                🌙
+            </button>
+        </div>
+        <form id="task-form" class="mb-4 space-y-2">
+            <input type="text" id="task-input" placeholder="Enter your task" required autocomplete="off"
+                class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
+            <input type="date" id="date-input" required
+                class="w-full p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
+            <button type="submit"
+                class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white p-2 rounded font-semibold shadow transition">Add Task</button>
+        </form>
+        <div class="flex gap-2 mb-4 w-full items-stretch">
+            <input type="text" id="filter-input" placeholder="Filter tasks..." autocomplete="off"
+                class="flex-1 min-w-0 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
+            <select id="status-filter"
+                class="w-24 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
+                <option value="">All</option>
+                <option value="Not Started">Not Started</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Done">Done</option>
+            </select>
+            <select id="sort-select"
+                class="w-36 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
+                <option value="date-asc">Sort by Date ↑</option>
+                <option value="date-desc">Sort by Date ↓</option>
+                <option value="alpha-asc">Sort A-Z</option>
+                <option value="alpha-desc">Sort Z-A</option>
+            </select>
+            <button id="delete-all-btn"
+                class="w-28 bg-red-500 hover:bg-red-600 text-white px-3 rounded font-semibold shadow transition whitespace-nowrap">Delete All</button>
+        </div>
+        <div class="overflow-x-auto">
+          <div class="rounded-lg shadow">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead class="bg-gray-100 dark:bg-gray-800">
+                <tr>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Task</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Deadline</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Status</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Action</th>
+                </tr>
+              </thead>
+              <tbody id="task-list" class="bg-white dark:bg-gray-900 divide-y divide-gray-100 dark:divide-gray-800"></tbody>
+            </table>
+          </div>
+        </div>
+    </div>
+    <script src="js/script.js"></script>
+</body>
+</html>
