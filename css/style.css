@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-gray-100 dark:bg-gray-900 font-sans leading-normal tracking-normal;
+}
+
+.container {
+    @apply mx-auto p-4;
+}
+
+.header {
+    @apply text-2xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100;
+}
+
+.form {
+    @apply bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 text-gray-900 dark:text-gray-100;
+}
+
+.input-field {
+    @apply border border-gray-300 rounded w-full py-2 px-3 mb-4 text-gray-900 dark:text-gray-100;
+}
+
+.button {
+    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+}
+
+.todo-list {
+    @apply mt-4;
+}
+
+.todo-item {
+    @apply flex justify-between items-center bg-white/90 dark:bg-gray-800/90 shadow rounded-lg p-3 transition text-gray-900 dark:text-gray-100;
+}
+
+.delete-btn {
+    @apply bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded shadow transition;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+input, select, button {
+    @apply transition;
+}
+
+input, select {
+    @apply bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600;
+}
+
+#task-input, #date-input, #filter-input {
+    @apply placeholder-gray-400 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100;
+}
+
+#delete-all-btn {
+    @apply bg-red-500 hover:bg-red-600 text-white;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+#dark-toggle {
+    @apply bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+h1 {
+    @apply text-gray-900 dark:text-gray-100;
+}
+
+ul#task-list li {
+    @apply text-gray-900 dark:text-gray-100;
+}
+
+@media (max-width: 640px) {
+    .header {
+        @apply text-xl;
+    }
+
+    .todo-item {
+        @apply flex-col items-start gap-2;
+    }
+    .filter-row {
+        @apply flex-col gap-2;
+    }
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none;
+    transition: filter 0.2s;
+}
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.2) contrast(1.2);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #a5b4fc;
+    border-radius: 8px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #6366f1;
+}
