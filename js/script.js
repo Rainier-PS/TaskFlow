@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     deleteAllBtn.addEventListener('click', () => {
         if (tasks.length && confirm('Delete all tasks?')) {
             tasks = [];
+            saveTasks(); 
             renderTasks();
         }
     });
@@ -69,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         tasks.push({ text: taskValue, date: dateValue, status: "Not Started" });
+        saveTasks(); 
         taskInput.value = '';
         dateInput.value = '';
         renderTasks();
@@ -76,7 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function deleteTask(index) {
         tasks.splice(index, 1);
+        saveTasks(); 
         renderTasks();
+    }
+
+    function saveTasks() {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
     function renderTasks() {
@@ -136,8 +143,31 @@ document.addEventListener('DOMContentLoaded', () => {
             sel.onchange = (e) => {
                 const idx = Number(sel.getAttribute('data-idx'));
                 tasks[idx].status = sel.value;
+                saveTasks(); 
             };
         });
+    }
+
+    const infoBtn = document.getElementById('info-btn');
+    const infoOverlay = document.getElementById('info-overlay');
+    const closeInfo = document.getElementById('close-info');
+    const infoBox = document.getElementById('info-box');
+
+    infoBtn.addEventListener('click', () => {
+        infoOverlay.classList.remove('hidden');
+    });
+    closeInfo.addEventListener('click', () => {
+        infoOverlay.classList.add('hidden');
+    });
+    infoOverlay.addEventListener('click', (e) => {
+        if (e.target === infoOverlay) {
+            infoOverlay.classList.add('hidden');
+        }
+    });
+
+    const storedTasks = localStorage.getItem('tasks');
+    if (storedTasks) {
+        tasks = JSON.parse(storedTasks);
     }
 
     renderTasks();
