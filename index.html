@@ -59,7 +59,7 @@
                 class="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white p-2 rounded font-semibold shadow transition">Add Task</button>
         </form>
         <div class="flex gap-2 mb-4 w-full items-stretch">
-            <input type="text" id="filter-input" placeholder="Filter tasks..." autocomplete="off"
+            <input type="text" id="filter-input" placeholder="Search Task..." autocomplete="off"
                 class="flex-1 min-w-0 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
             <select id="status-filter"
                 class="w-24 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
@@ -70,8 +70,10 @@
             </select>
             <select id="sort-select"
                 class="w-36 p-2 border border-gray-300 dark:border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white transition">
-                <option value="date-asc">Sort by Date ↑</option>
-                <option value="date-desc">Sort by Date ↓</option>
+                <option value="date-asc">Sort by Deadline ↑</option>
+                <option value="date-desc">Sort by Deadline ↓</option>
+                <option value="added-asc">Sort by Date Added ↑</option>
+                <option value="added-desc">Sort by Date Added ↓</option>
                 <option value="alpha-asc">Sort A-Z</option>
                 <option value="alpha-desc">Sort Z-A</option>
             </select>
@@ -85,6 +87,7 @@
                 <tr>
                   <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Task</th>
                   <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Deadline</th>
+                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Date Added</th>
                   <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Status</th>
                   <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Action</th>
                 </tr>
@@ -98,6 +101,13 @@
     <button id="info-btn" aria-label="Show info"
         class="fixed bottom-6 left-6 z-50 bg-blue-500 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow transition text-2xl focus:outline-none">
         ?
+    </button>
+    <button id="back-to-top-btn" aria-label="Back to top"
+        class="fixed bottom-6 right-6 z-50 bg-blue-500 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow transition text-2xl focus:outline-none hidden">
+        <!-- Filled, rounded arrow up SVG (rotated 180deg) -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor" style="transform: rotate(180deg);">
+          <path d="M12 4c.41 0 .75.34.75.75v10.19l3.72-3.72a.75.75 0 111.06 1.06l-5 5a.75.75 0 01-1.06 0l-5-5a.75.75 0 111.06-1.06l3.72 3.72V4.75c0-.41.34-.75.75-.75z"/>
+        </svg>
     </button>
     <script src="js/script.js"></script>
 </body> 
