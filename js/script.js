@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const darkToggle = document.getElementById('dark-toggle');
     const html = document.documentElement;
     const statusFilter = document.getElementById('status-filter');
+    const backToTopBtn = document.getElementById('back-to-top-btn');
 
     let tasks = [];
 
@@ -23,22 +24,31 @@ document.addEventListener('DOMContentLoaded', () => {
             darkToggle.textContent = '🌙';
         }
     }
+
     function detectDark() {
         const stored = localStorage.getItem('theme');
-        if (stored === 'dark') setDarkMode(true, false);
-        else if (stored === 'light') setDarkMode(false, false);
-        else setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches, false);
+        if (stored === 'dark') {
+            setDarkMode(true, false);
+        } else if (stored === 'light') {
+            setDarkMode(false, false);
+        } else {
+            setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches, false);
+        }
     }
+
     darkToggle.addEventListener('click', () => {
         setDarkMode(!html.classList.contains('dark'));
     });
+
     detectDark();
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('theme')) setDarkMode(e.matches, false);
+        if (!localStorage.getItem('theme')) {
+            setDarkMode(e.matches, false);
+        }
     });
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', e => {
         e.preventDefault();
         addTask();
     });
@@ -46,10 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
     filterInput.addEventListener('input', renderTasks);
     sortSelect.addEventListener('change', renderTasks);
     statusFilter.addEventListener('change', renderTasks);
+
     deleteAllBtn.addEventListener('click', () => {
         if (tasks.length && confirm('Delete all tasks?')) {
             tasks = [];
-            saveTasks(); 
+            saveTasks();
             renderTasks();
         }
     });
@@ -69,8 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        tasks.push({ text: taskValue, date: dateValue, status: "Not Started" });
-        saveTasks(); 
+        const now = new Date();
+        const dateAdded = now.toISOString().split('T')[0]; // YYYY-MM-DD
+
+        tasks.push({ text: taskValue, date: dateValue, dateAdded, status: "Not Started" });
+        saveTasks();
         taskInput.value = '';
         dateInput.value = '';
         renderTasks();
@@ -78,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function deleteTask(index) {
         tasks.splice(index, 1);
-        saveTasks(); 
+        saveTasks();
         renderTasks();
     }
 
@@ -102,6 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
         filtered.sort((a, b) => {
             if (sort === 'date-asc') return a.date.localeCompare(b.date);
             if (sort === 'date-desc') return b.date.localeCompare(a.date);
+            if (sort === 'added-asc') return a.dateAdded.localeCompare(b.dateAdded);
+            if (sort === 'added-desc') return b.dateAdded.localeCompare(a.dateAdded);
             if (sort === 'alpha-asc') return a.text.localeCompare(b.text);
             if (sort === 'alpha-desc') return b.text.localeCompare(a.text);
             return 0;
@@ -109,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         taskList.innerHTML = '';
         if (!filtered.length) {
-            taskList.innerHTML = `<tr><td colspan="4" class="text-center text-gray-400 dark:text-gray-500 py-4">No tasks found.</td></tr>`;
+            taskList.innerHTML = `<tr><td colspan="5" class="text-center text-gray-400 dark:text-gray-500 py-4">No tasks found.</td></tr>`;
             return;
         }
         filtered.forEach(task => {
@@ -120,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tr.innerHTML = `
                 <td class="px-4 py-2 align-middle text-gray-900 dark:text-gray-100 text-sm sm:text-base break-words max-w-[120px] sm:max-w-none">${task.text}</td>
                 <td class="px-4 py-2 align-middle text-gray-700 dark:text-gray-300 text-sm sm:text-base">${task.date}</td>
+                <td class="px-4 py-2 align-middle text-gray-700 dark:text-gray-300 text-sm sm:text-base">${task.dateAdded || '-'}</td>
                 <td class="px-4 py-2 align-middle">
                     <select class="status-dropdown bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-gray-900 dark:text-gray-100 transition text-sm sm:text-base" data-idx="${task.idx}">
                         ${statusOptions}
@@ -140,10 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.status-dropdown').forEach(sel => {
-            sel.onchange = (e) => {
+            sel.onchange = () => {
                 const idx = Number(sel.getAttribute('data-idx'));
                 tasks[idx].status = sel.value;
-                saveTasks(); 
+                saveTasks();
             };
         });
     }
@@ -156,10 +173,12 @@ document.addEventListener('DOMContentLoaded', () => {
     infoBtn.addEventListener('click', () => {
         infoOverlay.classList.remove('hidden');
     });
+
     closeInfo.addEventListener('click', () => {
         infoOverlay.classList.add('hidden');
     });
-    infoOverlay.addEventListener('click', (e) => {
+
+    infoOverlay.addEventListener('click', e => {
         if (e.target === infoOverlay) {
             infoOverlay.classList.add('hidden');
         }
@@ -171,4 +190,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     renderTasks();
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 100) {
+            backToTopBtn.classList.remove('hidden');
+        } else {
+            backToTopBtn.classList.add('hidden');
+        }
+    });
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 });
