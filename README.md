@@ -51,6 +51,5 @@ MIT — free to use, modify, or share.
 
 ## Notes
 
-- Tasks are not saved after closing the browser (no backend, no localStorage for tasks yet)
 - If you find a bug, open an issue or let me know
 - UI uses Tailwind CSS via CDN, no installation needed
