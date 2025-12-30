@@ -13,38 +13,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let tasks = [];
 
-    function setDarkMode(on, updateStorage = true) {
-        if (on) {
-            html.classList.add('dark');
-            if (updateStorage) localStorage.setItem('theme', 'dark');
-            darkToggle.textContent = '☀️';
-        } else {
-            html.classList.remove('dark');
-            if (updateStorage) localStorage.setItem('theme', 'light');
-            darkToggle.textContent = '🌙';
+    function refreshIcons() {
+        if (window.lucide) {
+            lucide.createIcons();
         }
     }
 
-    function detectDark() {
-        const stored = localStorage.getItem('theme');
-        if (stored === 'dark') {
-            setDarkMode(true, false);
-        } else if (stored === 'light') {
-            setDarkMode(false, false);
-        } else {
-            setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches, false);
-        }
+    function setTheme(mode) {
+        html.classList.toggle("dark", mode === "dark");
+
+        darkToggle.textContent = "";
+
+        const icon = document.createElement("i");
+        icon.setAttribute("data-lucide", mode === "dark" ? "sun" : "moon");
+        icon.className =
+            "w-5 h-5 text-gray-800 dark:text-white " +
+            "dark:drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]";
+        icon.setAttribute("aria-hidden", "true");
+
+        darkToggle.appendChild(icon);
+
+        darkToggle.setAttribute(
+            "aria-pressed",
+            mode === "dark" ? "true" : "false"
+        );
+
+        localStorage.setItem("theme", mode);
+        refreshIcons();
     }
 
-    darkToggle.addEventListener('click', () => {
-        setDarkMode(!html.classList.contains('dark'));
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark" || savedTheme === "light") {
+        setTheme(savedTheme);
+    } else {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        setTheme(prefersDark ? "dark" : "light");
+    }
+
+    darkToggle.addEventListener("click", () => {
+        const isDark = html.classList.contains("dark");
+        setTheme(isDark ? "light" : "dark");
     });
 
-    detectDark();
-
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        if (!localStorage.getItem('theme')) {
-            setDarkMode(e.matches, false);
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+        if (!localStorage.getItem("theme")) {
+            setTheme(e.matches ? "dark" : "light");
         }
     });
 
@@ -65,8 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    function sanitize(str) {
+        return str.replace(/[<>&"'`]/g, c => ({
+            '<': '&lt;',
+            '>': '&gt;',
+            '&': '&amp;',
+            '"': '&quot;',
+            "'": '&#39;',
+            '`': '&#96;'
+        })[c]);
+    }
+
     function addTask() {
-        const taskValue = taskInput.value.trim();
+        const taskValue = sanitize(taskInput.value.trim());
         const dateValue = dateInput.value;
 
         if (!taskValue) {
@@ -74,16 +98,33 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => taskInput.classList.remove('ring-2', 'ring-red-400'), 1000);
             return;
         }
+        if (taskValue.length > 100) {
+            alert("Task name must be under 100 characters.");
+            return;
+        }
         if (!dateValue) {
             dateInput.classList.add('ring-2', 'ring-red-400');
             setTimeout(() => dateInput.classList.remove('ring-2', 'ring-red-400'), 1000);
+            return;
+        }
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        if (new Date(dateValue) < today) {
+            alert("Deadline cannot be in the past.");
             return;
         }
 
         const now = new Date();
         const dateAdded = now.toISOString().split('T')[0]; // YYYY-MM-DD
 
-        tasks.push({ text: taskValue, date: dateValue, dateAdded, status: "Not Started" });
+        tasks.push(Object.freeze({
+            text: taskValue,
+            date: dateValue,
+            dateAdded,
+            status: "Not Started"
+        }));
+
         saveTasks();
         taskInput.value = '';
         dateInput.value = '';
@@ -101,11 +142,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderTasks() {
+        const validTasks = tasks.filter(t =>
+            typeof t.text === 'string' &&
+            typeof t.date === 'string' &&
+            typeof t.status === 'string'
+        );
+
+        tasks = [...validTasks];
+
         const filterValue = filterInput.value.toLowerCase();
         const statusValue = statusFilter.value;
 
         let filtered = tasks
-            .map((t, i) => ({ ...t, idx: i }))
+            .map((t, i) => Object.freeze({ ...t, idx: i }))
             .filter(
                 t =>
                     (t.text.toLowerCase().includes(filterValue) || t.date.includes(filterValue)) &&
@@ -125,50 +174,94 @@ document.addEventListener('DOMContentLoaded', () => {
 
         taskList.innerHTML = '';
         if (!filtered.length) {
-            taskList.innerHTML = `<tr><td colspan="5" class="text-center text-gray-400 dark:text-gray-500 py-4">No tasks found.</td></tr>`;
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 5;
+            td.className = "text-center text-gray-400 dark:text-gray-500 py-4";
+            td.textContent = "No tasks found.";
+            tr.appendChild(td);
+            taskList.appendChild(tr);
             return;
         }
+
         filtered.forEach(task => {
-            const statusOptions = ["Not Started", "In Progress", "Done"].map(
-                s => `<option value="${s}"${task.status === s ? " selected" : ""}>${s}</option>`
-            ).join('');
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="px-4 py-2 align-middle text-gray-900 dark:text-gray-100 text-sm sm:text-base break-words max-w-[120px] sm:max-w-none">${task.text}</td>
-                <td class="px-4 py-2 align-middle text-gray-700 dark:text-gray-300 text-sm sm:text-base">${task.date}</td>
-                <td class="px-4 py-2 align-middle text-gray-700 dark:text-gray-300 text-sm sm:text-base">${task.dateAdded || '-'}</td>
-                <td class="px-4 py-2 align-middle">
-                    <select class="status-dropdown bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-gray-900 dark:text-gray-100 transition text-sm sm:text-base" data-idx="${task.idx}">
-                        ${statusOptions}
-                    </select>
-                </td>
-                <td class="px-2 py-2 align-middle">
-                    <button class="delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 sm:px-3 rounded shadow transition text-xs sm:text-base whitespace-nowrap flex items-center justify-center" aria-label="Delete task" data-idx="${task.idx}">
-                        <span class="hidden sm:inline">Delete</span>
-                        <svg class="inline sm:hidden w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </td>
-            `;
+
+            const tdText = document.createElement('td');
+            tdText.className = "px-4 py-2 align-middle text-gray-900 dark:text-gray-100 text-sm sm:text-base break-words max-w-[120px] sm:max-w-none";
+            tdText.textContent = task.text;
+
+            const tdDate = document.createElement('td');
+            tdDate.className = "px-4 py-2 align-middle text-gray-700 dark:text-gray-300 text-sm sm:text-base";
+            tdDate.textContent = task.date;
+
+            const tdAdded = document.createElement('td');
+            tdAdded.className = "px-4 py-2 align-middle text-gray-700 dark:text-gray-300 text-sm sm:text-base";
+            tdAdded.textContent = task.dateAdded || '-';
+
+            const tdStatus = document.createElement('td');
+            const select = document.createElement('select');
+            select.className = "status-dropdown bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded px-2 py-1";
+            select.dataset.idx = task.idx;
+
+            ["Not Started", "In Progress", "Done"].forEach(s => {
+            const option = document.createElement('option');
+            option.value = s;
+            option.textContent = s;
+            if (task.status === s) option.selected = true;
+            select.appendChild(option);
+            });
+
+            tdStatus.appendChild(select);
+
+            const tdAction = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.className = "delete-btn bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded shadow transition";
+            btn.textContent = "Delete";
+            btn.dataset.idx = task.idx;
+
+            tdAction.appendChild(btn);
+
+            tr.append(tdText, tdDate, tdAdded, tdStatus, tdAction);
             taskList.appendChild(tr);
         });
 
         document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.onclick = () => deleteTask(Number(btn.getAttribute('data-idx')));
+            btn.addEventListener('click', () => {
+                deleteTask(Number(btn.dataset.idx));
+            });
         });
+
 
         document.querySelectorAll('.status-dropdown').forEach(sel => {
             sel.onchange = () => {
-                const idx = Number(sel.getAttribute('data-idx'));
-                tasks[idx].status = sel.value;
-                saveTasks();
+                const idx = Number(sel.dataset.idx);
+                const allowed = ["Not Started", "In Progress", "Done"];
+
+                if (allowed.includes(sel.value)) {
+                    tasks[idx] = Object.freeze({
+                        ...tasks[idx],
+                        status: sel.value
+                    });
+                    saveTasks();
+                    renderTasks();
+                }
             };
         });
+        
+        refreshIcons();
     }
 
     const infoBtn = document.getElementById('info-btn');
     const infoOverlay = document.getElementById('info-overlay');
     const closeInfo = document.getElementById('close-info');
     const infoBox = document.getElementById('info-box');
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !infoOverlay.hidden) {
+            closeInfo.click();
+        }
+    });
 
     infoBtn.addEventListener('click', () => {
         infoOverlay.classList.remove('hidden');
@@ -186,10 +279,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const storedTasks = localStorage.getItem('tasks');
     if (storedTasks) {
-        tasks = JSON.parse(storedTasks);
+        try {
+            const parsed = JSON.parse(storedTasks);
+            if (Array.isArray(parsed)) {
+                tasks = parsed.filter(t =>
+                    typeof t.text === 'string' &&
+                    typeof t.date === 'string' &&
+                    typeof t.status === 'string'
+                );
+            }
+        } catch {
+            localStorage.removeItem('tasks');
+            tasks = [];
+        }
     }
 
     renderTasks();
+    refreshIcons();
 
     window.addEventListener('scroll', () => {
         if (window.scrollY > 100) {
@@ -203,3 +309,4 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 });
+
