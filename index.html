@@ -15,6 +15,7 @@
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://em-content.zobj.net/source/microsoft-teams/363/memo_1f4dd.png">
     <meta property="og:url" content="">
+    <script src="https://unpkg.com/lucide@0.562.0" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -24,14 +25,26 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg-gradient-to-br from-blue-100 via-purple-100 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen flex flex-col items-center justify-center transition-colors duration-300">
-    <!-- Overlay should be here, before or after the main container -->
-    <div id="info-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-lg flex items-center justify-center z-50 hidden">
+    <a href="#main-content"
+        class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4
+                bg-white dark:bg-gray-800 text-blue-600 dark:text-purple-300
+                px-4 py-2 rounded shadow z-[999]">
+        Skip to main content
+    </a>
+
+    <div id="info-overlay" role="dialog" aria-modal="true" aria-labelledby="info-title" class="fixed inset-0 bg-black/40 backdrop-blur-lg flex items-center justify-center z-50 hidden">
         <div id="info-box" class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 max-w-md w-full relative">
             <button id="close-info" aria-label="Close info"
-                class="absolute top-1 right-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-full w-8 h-8 flex items-center justify-center text-xl font-bold leading-none hover:bg-blue-200 dark:hover:bg-purple-700 transition">
-                &times;
+                class="absolute top-1 right-1 w-8 h-8 rounded-full
+                        flex items-center justify-center
+                        bg-gray-200 dark:bg-gray-700
+                        hover:bg-blue-200 dark:hover:bg-purple-700
+                        text-gray-800 dark:text-gray-100
+                        transition">
+                <i data-lucide="x" class="w-4 h-4" aria-hidden="true"></i>
             </button>
-            <h2 class="text-xl font-bold mb-2 text-blue-700 dark:text-purple-300">Welcome to TaskFlow!</h2>
+
+            <h2 id="info-title" class="text-xl font-bold mb-2 text-blue-700 dark:text-purple-300">Welcome to TaskFlow!</h2>
             <ul class="list-disc pl-5 space-y-2 text-gray-700 dark:text-gray-300 text-base">
                 <li>Add tasks with a name and deadline.</li>
                 <li>Change task status (Not Started, In Progress, Done).</li>
@@ -46,9 +59,13 @@
     <div class="w-full max-w-lg p-6 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-xl backdrop-blur-md relative">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-3xl font-extrabold text-blue-700 dark:text-purple-300 tracking-tight">To-Do List</h1>
-            <button id="dark-toggle" aria-label="Toggle dark mode" class="text-xl p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-200 dark:hover:bg-purple-700 transition-colors">
-                🌙
+            <button id="dark-toggle"
+                aria-label="Toggle dark mode"
+                aria-pressed="false"
+                class="text-xl p-2 rounded-full bg-gray-200 dark:bg-gray-700
+                        hover:bg-blue-200 dark:hover:bg-purple-700 transition-colors">
             </button>
+
         </div>
         <form id="task-form" class="mb-4 space-y-2">
             <input type="text" id="task-input" placeholder="Enter your task" required autocomplete="off"
@@ -85,11 +102,11 @@
             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead class="bg-gray-100 dark:bg-gray-800">
                 <tr>
-                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Task</th>
-                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Deadline</th>
-                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Date Added</th>
-                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Status</th>
-                  <th class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Action</th>
+                  <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Task</th>
+                  <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Deadline</th>
+                  <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Date Added</th>
+                  <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Status</th>
+                  <th scope="col" class="px-4 py-2 text-left font-semibold text-gray-700 dark:text-gray-200">Action</th>
                 </tr>
               </thead>
               <tbody id="task-list" class="bg-white dark:bg-gray-900 divide-y divide-gray-100 dark:divide-gray-800"></tbody>
@@ -99,16 +116,23 @@
     </div>
 
     <button id="info-btn" aria-label="Show info"
-        class="fixed bottom-6 left-6 z-50 bg-blue-500 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow transition text-2xl focus:outline-none">
-        ?
+        class="fixed bottom-6 left-6 z-50
+                bg-blue-500 hover:bg-blue-700
+                text-white rounded-full w-12 h-12
+                flex items-center justify-center
+                shadow transition focus:outline-none">
+        <i data-lucide="info" class="w-6 h-6" aria-hidden="true"></i>
     </button>
+
     <button id="back-to-top-btn" aria-label="Back to top"
-        class="fixed bottom-6 right-6 z-50 bg-blue-500 hover:bg-blue-700 text-white rounded-full w-12 h-12 flex items-center justify-center shadow transition text-2xl focus:outline-none hidden">
-        <!-- Filled, rounded arrow up SVG (rotated 180deg) -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor" style="transform: rotate(180deg);">
-          <path d="M12 4c.41 0 .75.34.75.75v10.19l3.72-3.72a.75.75 0 111.06 1.06l-5 5a.75.75 0 01-1.06 0l-5-5a.75.75 0 111.06-1.06l3.72 3.72V4.75c0-.41.34-.75.75-.75z"/>
-        </svg>
+        class="fixed bottom-6 right-6 z-50
+                bg-blue-500 hover:bg-blue-700
+                text-white rounded-full w-12 h-12
+                flex items-center justify-center
+                shadow transition focus:outline-none hidden">
+        <i data-lucide="info" class="w-6 h-6" aria-hidden="true"></i>
     </button>
+
     <script src="js/script.js"></script>
 </body> 
 </html>
